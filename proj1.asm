@@ -60,7 +60,8 @@ soma:
     JMP fim
 
 soma_of:
-    MOV AX, CH
+    XOR CL, CL
+    MOV AX, CX
     MOV BL, 10
     DIV BL
     MOV BX, AX
