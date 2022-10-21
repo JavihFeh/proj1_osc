@@ -43,13 +43,17 @@ TITLE 22896419_joao
     CMP AL,32h
     JE subtra
 
-soma:
-    ADD CH, CL
-    CMP CH, 0Ah
-    JAE soma_of
-    ADD CH, 30h
+    CMP AL,33h
+    JE multi
 
-    MOV CH,09
+soma:
+    ADD CL, CH
+    CMP CL, 0Ah
+    JAE soma_of
+
+    ADD CL, 30h
+
+    MOV AH,09
     LEA DX,res
     INT 21h
 
@@ -60,20 +64,27 @@ soma:
     JMP fim
 
 soma_of:
-    XOR CL, CL
+    XOR CH, CH
     MOV AX, CX
     MOV BL, 10
     DIV BL
-    MOV BX, AX
-    MOV DL,BL
-    OR BL, 30h
+    MOV CX, AX
+
+    MOV AH,09
+    LEA DX,res
+    INT 21h
+
+    ADD CL, 30h
+    MOV DL,CL
 
     MOV AH, 02h
     INT 21h
 
-    MOV DL,BH
-    OR DL, 30h
+    MOV DL,CH
+    ADD DL, 30h
     INT 21h
+
+    JMP fim
 
 subtra:
     CMP CH,CL
@@ -111,6 +122,42 @@ sub_bh_menor:
 
     JMP fim
 
+multi:
+    MOV AL,CL
+    AND AL,1
+    JZ multi_par
+    JMP multi_impar
+multi_par:
+    MOV AH, CH
+    ADD CH, AH
+    ADD CH, AH
+    SUB CL,2
+
+    CMP CL,0
+    JNZ multip_volta
+
+    ADD CH,30h
+    MOV AH,02
+    MOV DL,CH
+    INT 21h
+
+    JMP fim
+
+multip_volta:
+    SHL CH,1
+    SUB CL,2
+
+    CMP CL,0
+    JNZ multip_volta
+
+    ADD CH,30h 
+
+    MOV AH,02
+    MOV DL,CH
+    INT 21h
+
+    JMP fim
+multi_impar:
 fim:
     MOV AH,4Ch
     INT 21h
