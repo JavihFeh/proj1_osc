@@ -123,41 +123,62 @@ sub_bh_menor:
     JMP fim
 
 multi:
-    MOV AL,CL
-    AND AL,1
-    JZ multi_par
-    JMP multi_impar
-multi_par:
-    MOV AH, CH
-    ADD CH, AH
-    ADD CH, AH
-    SUB CL,2
+    CMP CL,00h
+    JE res_multi
 
-    CMP CL,0
-    JNZ multip_volta
+    MOV BH,CL
+    AND CL,01h
+    MOV CL,BH
+    JNZ add_multi
 
-    ADD CH,30h
-    MOV AH,02
-    MOV DL,CH
-    INT 21h
-
-    JMP fim
-
-multip_volta:
+    SHR CL,1
     SHL CH,1
-    SUB CL,2
 
-    CMP CL,0
-    JNZ multip_volta
+    JMP multi
 
-    ADD CH,30h 
+add_multi:
+    ADD BL,Ch
+    SHR CL,1
+    SHL CH,1
 
-    MOV AH,02
-    MOV DL,CH
+    JMP multi
+
+res_multi:
+    CMP BL,9
+    JA ov_multi
+    MOV AH,09
+    LEA DX, res
+    INT 21h
+
+    MOV AH, 02
+    ADD BL, 30h
+    MOV DL, BL
     INT 21h
 
     JMP fim
-multi_impar:
+ov_multi:
+    XOR CX,CX
+    MOV CL,BL
+    MOV AX, CX
+    MOV BL, 10
+    DIV BL
+    MOV CX, AX
+
+    MOV AH,09
+    LEA DX,res
+    INT 21h
+
+    ADD CL, 30h
+    MOV DL,CL
+
+    MOV AH, 02h
+    INT 21h
+
+    MOV DL,CH
+    ADD DL,30h
+    INT 21h
+
+    JMP fim
 fim:
     MOV AH,4Ch
     INT 21h
