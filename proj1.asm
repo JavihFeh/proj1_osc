@@ -186,9 +186,8 @@ ov_multi:               ; caso a multiplicacao tenha resultado de 2 digitos
     JMP fim         ; Vai para o fim do programa
 
 divisao:
-    XOR BL, BL
     XOR AL, AL
-    MOV AL, CL
+    MOV BH, CL      ; Armazena em BH o valor inicial do divisor
 
     CMP CL,00h      ; Compara se o divisor é zero
     JE erro_div     ; Caso for pula para a mensagem de erro
@@ -197,29 +196,30 @@ divisao:
     JB res_div      ; Caso sim, não há divisão e passa direto para o resultado
 
 achar_maior_divisor:
-    CMP CH,CL       ; Compara se CH é maior que CL
-    JB sair         ; Se CL se tornar maior que CH ele sai do loop
-    SHL CL,1        ;
-    JMP dividir     ; Descola CL para a esquerda até ele ser maior que CH
+    CMP CH,CL                   ; Compara se CH é maior que CL
+    JB sair                     ; Se CL se tornar maior que CH ele sai do loop
+
+    SHL CL,1                    ;
+    JMP achar_maior_divisor     ; Descola CL para a esquerda até ele ser maior que CH
 sair:
     SHR CL,1        ; Move CL para direita para ser o maior divisor de CH
+
 dividir:
-    SUB CH, CL      ; Diminui CL de CH
+    SUB CH, CL      ; Diminui o valor de CL de CH
     ADD BL,1        ; Adiciona 1 no quociente
 
 comparacao_div:
-    CMP CL, AL      ; Compara se CL(divisor) é menor ou igual ao seu valor inicial
-    JBE res_div     ; Se for pula para o resultado
-    CMP CH, 00h     ; Compara se o resto é zero
-    JE res_div      ; Se for, pula para o resultado
     CMP CH, CL      ; Compara se CH ainda é maior ou igual a CL
     JAE dividir     ; Se for ele subitrai mais uma vez
+    CMP CH, 00h     ; Compara se o resto é zero
+    JE res_div      ; Se for, pula para o resultado
+    CMP CL, BH      ; Compara se CL(divisor) é menor ou igual ao seu valor inicial
+    JBE res_div     ; Se for pula para o resultado
 
+    SHR CL,1            ; Caso nenhuma das anteriores, desloca CL para a direita
+    SHL BL,1            ; E descola BL(Quociente) para a esquerda
 
-    SHR CL,1        ; Caso nenhuma das anteriores, desloca CL para a direita
-    SHL BL,1        ; E descola BL(Quociente) para a esquerda
-
-    JMP comparacao_div ; Compara novamente
+    JMP comparacao_div  ; Compara novamente
 
 res_div:            ; resultado de divisao
     MOV AH,09       ;
@@ -246,7 +246,7 @@ erro_div:
     MOV AH,09       ;
     LEA DX,div_zero ; Imprime a mensagem de erro de divisao por zero
     INT 21h         ;
-
+    
 fim:
     MOV AH,4Ch      ;
     INT 21h         ; Encerra o programa
