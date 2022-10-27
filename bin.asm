@@ -18,10 +18,10 @@
 
     LEITURA PROC
 loop_leitura:
-        MOV AH,02
+        MOV AH,01
         INT 21h
 
-        CMP AL,13
+        CMP AL,0Dh
         JE volta_l
 
         SHL BL,1
@@ -42,13 +42,19 @@ volta_l:
     ENDP LEITURA
 
     IMPRIME PROC
+        MOV AH,02
         MOV CX,8
 imprimir:
         SAL BL,1
         JC um
-um:
-
+        MOV DL, 30h
+        INT 21h
         LOOP imprimir
+um:
+        MOV DL, 31h
+        INT 21h
+        LOOP imprimir
+        RET
     ENDP IMPRIME
 
     END MAIN
