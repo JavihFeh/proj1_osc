@@ -231,14 +231,29 @@ res_div:            ; resultado de divisao
     ADD DL,30h      ; Transforma o resultado em caractrer
     INT 21h         ; Imprime o resultado da divisão
 
-    MOV AH,09       ;
-    LEA DX,resto    ; Imprime a mensagem de resto
-    INT 21h         ;
+    XOR AX,AX       ; Zera AX para fazer as operações
+    MOV BL,BH       ; Coloca o divisor dado pelo ususario em BL para efetuar a divisão
+    MOV AX,100      ; Move 100 para AX para ter uma presão de 2 digitos
+    DIV BL          ; Divide AX por BL(divisor)
 
-    MOV AH,02       ;
-    MOV DL,CH       ; Armazena o resto da impressão no registrador de impressõa
-    ADD DL,30h      ; Transforma o resto em caracter
-    INT 21h         ; Imrpime
+    MUL CH          ; Multiplica o resultado pelo resto
+    MOV BL,10       ; 
+    DIV BL          ; Separa o resto em dois digitos
+
+    MOV BX,AX       ; Move todo o resultado para BX
+    ADD BH,30h      ;
+    ADD BL,30h      ; Transforma ambos os numeros em letras
+
+    MOV AH,02       ; Função de impressão
+    MOV DL,2Ch      ;
+    INT 21h         ; Imprime uma virgula
+
+    MOV DL,BL       ; 
+    INT 21h         ;Imprime o primeiro digito
+
+    MOV DL,BH       ;
+    INT 21h         ;Imprime o segundo digito
+    
 
     JMP fim         ; Vai para o fim do programa
 
