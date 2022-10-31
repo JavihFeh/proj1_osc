@@ -6,7 +6,6 @@ TITLE 22896419_joao
     num2 db 10,'Entre com outro numero: $'
     ope db 10,'Escolha a operacao:',10,'1-Adicao',10,'2-Subtracao',10,'3-Multiplicacao',10,'4-Divisao',10,'$'
     res db 10,'Resultado: $'
-    resto db 10,'Resto: $'
     div_zero db 10,'Nao ha divisao por zero$'
 .code
     MAIN PROC
